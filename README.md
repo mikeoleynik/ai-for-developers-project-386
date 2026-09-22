@@ -10,20 +10,37 @@
 
 ## Стек
 
-- Разное
+- Монорепо на pnpm workspaces
+- Бекенд: Fastify + TypeScript (`apps/api`)
+- Фронтенд: Vite + React + TypeScript + shadcn/ui (`apps/web`)
+- Тесты: Vitest (дымовой тест API)
+- Линтер: ESLint (flat config) + `tsc --noEmit`
+- Релизы: release-please поверх Conventional Commits
+
+## Требования
+
+- Node.js 20.19+ или 22.12+
+- pnpm (версия закреплена полем `packageManager`, например через corepack)
 
 ## Установка
-
-<!-- Опишите установку: клонирование, зависимости, переменные окружения -->
 
 ```bash
 git clone https://github.com/mikeoleynik/ai-for-developers-project-386.git
 cd ai-for-developers-project-386
+pnpm install
 ```
 
 ## Использование
 
-<!-- Добавьте примеры запуска и запись asciinema — именно это смотрит работодатель -->
+```bash
+pnpm dev               # API и фронтенд одновременно
+pnpm --filter api dev  # только API (порт 8080)
+pnpm --filter web dev  # только фронтенд
+pnpm test              # дымовой тест API
+pnpm lint              # ESLint + проверка типов
+```
+
+Поднятый API отвечает на `GET http://localhost:8080/ping` телом `pong`.
 
 ---
 
