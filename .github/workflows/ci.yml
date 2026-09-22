@@ -8,21 +8,28 @@ permissions:
   contents: read
 
 jobs:
-  ci:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22
-
-      - uses: pnpm/action-setup@v6
+      # Version is read from the packageManager field in package.json (pnpm@10.33.0).
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
         with:
           cache: true
 
-      - run: pnpm install --frozen-lockfile
+      # Vite 8 requires Node ^20.19.0 || >=22.12.0; "22" floats to the latest 22.x.
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
 
-      - run: pnpm lint
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - run: pnpm test
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
