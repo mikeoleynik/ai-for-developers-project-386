@@ -9,7 +9,7 @@ pnpm install               # установка зависимостей
 pnpm dev                   # API (:8080) и фронтенд вместе
 pnpm --filter api dev      # только API
 pnpm --filter web dev      # только фронтенд
-pnpm test                  # дымовой тест API (Vitest)
+pnpm test                  # тесты API и web (Vitest)
 pnpm lint                  # ESLint + tsc --noEmit в обоих пакетах
 ```
 
