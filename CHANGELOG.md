@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/mikeoleynik/ai-for-developers-project-386/compare/call-calendar-v1.0.0...call-calendar-v1.1.0) (2026-09-24)
+
+
+### Features
+
+* add call calendar landing page with routing and tests ([fe923de](https://github.com/mikeoleynik/ai-for-developers-project-386/commit/fe923de78dfc2212acf76e2515d126fbe2a95807))
+
 ## 1.0.0 (2026-09-22)
 
 
