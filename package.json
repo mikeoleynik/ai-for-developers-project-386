@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "pnpm --parallel --filter api --filter web dev",
     "lint": "eslint . && pnpm --filter api typecheck && pnpm --filter web typecheck",
-    "test": "pnpm --filter api test"
+    "test": "pnpm -r test"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
