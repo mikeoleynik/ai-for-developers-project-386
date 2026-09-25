@@ -4,6 +4,11 @@ export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});
 };
 
+export type ApiError = {
+    code: string;
+    message: string;
+};
+
 export type Booking = {
     id: string;
     eventTypeId: string;
@@ -25,9 +30,8 @@ export type DayAvailability = {
     startTimes: Array<string>;
 };
 
-export type Error = {
-    code: string;
-    message: string;
+export type ErrorResponse = {
+    error: ApiError;
 };
 
 export type EventType = {
@@ -52,7 +56,7 @@ export type AvailabilityListErrors = {
     /**
      * An unexpected error response.
      */
-    default: Error;
+    default: ErrorResponse;
 };
 
 export type AvailabilityListError = AvailabilityListErrors[keyof AvailabilityListErrors];
@@ -93,7 +97,7 @@ export type BookingsCreateErrors = {
     /**
      * An unexpected error response.
      */
-    default: Error;
+    default: ErrorResponse;
 };
 
 export type BookingsCreateError = BookingsCreateErrors[keyof BookingsCreateErrors];
@@ -134,7 +138,7 @@ export type EventTypesCreateErrors = {
     /**
      * An unexpected error response.
      */
-    default: Error;
+    default: ErrorResponse;
 };
 
 export type EventTypesCreateError = EventTypesCreateErrors[keyof EventTypesCreateErrors];

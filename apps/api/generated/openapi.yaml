@@ -40,7 +40,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
   /bookings:
     get:
       operationId: Bookings_list
@@ -69,7 +69,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
       requestBody:
         required: true
         content:
@@ -104,7 +104,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ErrorResponse'
       requestBody:
         required: true
         content:
@@ -113,6 +113,16 @@ paths:
               $ref: '#/components/schemas/EventType'
 components:
   schemas:
+    ApiError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
     Booking:
       type: object
       required:
@@ -166,16 +176,13 @@ components:
           type: array
           items:
             type: string
-    Error:
+    ErrorResponse:
       type: object
       required:
-        - code
-        - message
+        - error
       properties:
-        code:
-          type: string
-        message:
-          type: string
+        error:
+          $ref: '#/components/schemas/ApiError'
     EventType:
       type: object
       required:
