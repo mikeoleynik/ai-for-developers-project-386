@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "pnpm --parallel --filter api --filter web dev",
+    "generate": "pnpm --filter api generate && pnpm --filter web generate",
     "lint": "eslint . && pnpm --filter api typecheck && pnpm --filter web typecheck",
     "test": "pnpm -r test"
   },

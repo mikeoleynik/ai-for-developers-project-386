@@ -7,7 +7,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig(
-  globalIgnores(['**/dist']),
+  globalIgnores(['**/dist', 'apps/web/src/client']),
   {
     name: 'api',
     files: ['apps/api/**/*.ts'],
