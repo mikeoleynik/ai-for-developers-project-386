@@ -7,10 +7,14 @@ using Http;
 })
 namespace CalendarBooking;
 
-@error
-model Error {
+model ApiError {
   code: string;
   message: string;
+}
+
+@error
+model ErrorResponse {
+  error: ApiError;
 }
 
 model EventType {
@@ -44,7 +48,7 @@ model DayAvailability {
 @route("/event-types")
 interface EventTypes {
   @get list(): EventType[];
-  @post create(@body body: EventType): EventType | Error;
+  @post create(@body body: EventType): EventType | ErrorResponse;
 }
 
 @route("/availability")
@@ -53,11 +57,11 @@ interface Availability {
     @query eventTypeId: string,
     @query from: string,
     @query to: string,
-  ): DayAvailability[] | Error;
+  ): DayAvailability[] | ErrorResponse;
 }
 
 @route("/bookings")
 interface Bookings {
   @get list(): Booking[];
-  @post create(@body body: CreateBooking): Booking | Error;
+  @post create(@body body: CreateBooking): Booking | ErrorResponse;
 }

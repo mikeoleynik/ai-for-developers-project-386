@@ -20,7 +20,6 @@
     "@typespec/http": "^1.16.0",
     "@typespec/openapi3": "^1.16.0",
     "fastify-tsconfig": "^3.0.0",
-    "openapi-typescript": "^7.13.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.1"
