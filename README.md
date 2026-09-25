@@ -13,7 +13,8 @@
 - Монорепо на pnpm workspaces
 - Бекенд: Fastify + TypeScript (`apps/api`)
 - Фронтенд: Vite + React + TypeScript + shadcn/ui (`apps/web`)
-- Тесты: Vitest (дымовой тест API)
+- Тесты: Vitest (API и web)
+- Контракт: TypeSpec → OpenAPI → клиентский SDK
 - Линтер: ESLint (flat config) + `tsc --noEmit`
 - Релизы: release-please поверх Conventional Commits
 
@@ -36,8 +37,20 @@ pnpm install
 pnpm dev               # API и фронтенд одновременно
 pnpm --filter api dev  # только API (порт 8080)
 pnpm --filter web dev  # только фронтенд
-pnpm test              # дымовой тест API
+pnpm generate          # перегенерировать контракт (OpenAPI + SDK)
+pnpm test              # тесты API и web
 pnpm lint              # ESLint + проверка типов
+```
+
+## Контракт и кодогенерация
+
+Контракт API — единый источник правды, описан в [TypeSpec](https://typespec.io/) в `apps/api/tsp/main.tsp`. Из него одной командой генерируется:
+
+- OpenAPI-спецификация — `apps/api/generated/openapi.yaml`;
+- типизированный клиентский SDK для фронтенда — `apps/web/src/client` (heyapi/openapi-ts);
+- серверные маршруты и валидация присоединяются из OpenAPI через `fastify-openapi-glue`.
+
+Сгенерированные файлы коммитятся и не правятся руками.
 ```
 
 Поднятый API отвечает на `GET http://localhost:8080/ping` телом `pong`.
