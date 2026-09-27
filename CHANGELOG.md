@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/mikeoleynik/ai-for-developers-project-386/compare/call-calendar-v1.1.0...call-calendar-v1.2.0) (2026-09-27)
+
+
+### Features
+
+* add TypeSpec contract and OpenAPI codegen pipeline ([c0d99fd](https://github.com/mikeoleynik/ai-for-developers-project-386/commit/c0d99fd003f2b74cac70c9185c6565daaf03e15f))
+* wire API routes and validation from the OpenAPI contract ([45e6ed6](https://github.com/mikeoleynik/ai-for-developers-project-386/commit/45e6ed61a37be58e0f421df089f46263b766b6a5))
+
+
+### Bug Fixes
+
+* correct error model shape and drop unused openapi-typescript ([c10bacd](https://github.com/mikeoleynik/ai-for-developers-project-386/commit/c10bacd78424a7aaf60a35d36f92d6a8f351bd3d))
+
 ## [1.1.0](https://github.com/mikeoleynik/ai-for-developers-project-386/compare/call-calendar-v1.0.0...call-calendar-v1.1.0) (2026-09-24)
 
 
