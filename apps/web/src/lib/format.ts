@@ -1,4 +1,5 @@
-export const CALENDAR_TIME_ZONE = 'Europe/Moscow'
+export const CALENDAR_TIME_ZONE =
+  import.meta.env.VITE_CALENDAR_TIMEZONE ?? 'Europe/Moscow'
 
 export function formatSlot(iso: string): string {
   return new Intl.DateTimeFormat('ru-RU', {

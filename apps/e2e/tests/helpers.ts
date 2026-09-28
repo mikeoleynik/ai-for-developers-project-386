@@ -2,13 +2,15 @@ import type { APIRequestContext } from '@playwright/test'
 
 export const API_URL = 'http://localhost:8080'
 
+const CALENDAR_TIME_ZONE = process.env.CALENDAR_TIMEZONE ?? 'Europe/Moscow'
+
 export function uniqueId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`
 }
 
 export function moscowToday(): string {
   return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Europe/Moscow',
+    timeZone: CALENDAR_TIME_ZONE,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -17,7 +19,7 @@ export function moscowToday(): string {
 
 export function moscowTime(iso: string): string {
   return new Intl.DateTimeFormat('ru-RU', {
-    timeZone: 'Europe/Moscow',
+    timeZone: CALENDAR_TIME_ZONE,
     hour: '2-digit',
     minute: '2-digit',
   }).format(new Date(iso))

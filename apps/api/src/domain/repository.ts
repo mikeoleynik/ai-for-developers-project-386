@@ -3,11 +3,7 @@ import { randomUUID } from 'node:crypto'
 import Database from 'better-sqlite3'
 
 import { conflict, unprocessable } from '../errors.js'
-
-export type Interval = {
-  start: Date
-  end: Date
-}
+import { overlaps, type Interval } from './interval.js'
 
 export type EventType = {
   id: string
@@ -137,13 +133,15 @@ export function createSqliteRepository(path: string): Repository {
 
   const createBookingTransaction = db.transaction(
     (input: BookingRecord, durationMinutes: number): BookingRecord => {
-      const start = new Date(input.start).getTime()
-      const end = start + durationMinutes * 60_000
+      const start = new Date(input.start)
+      const end = new Date(start.getTime() + durationMinutes * 60_000)
 
       for (const row of bookingIntervals.all()) {
-        const rowStart = new Date(row.start).getTime()
-        const rowEnd = rowStart + row.duration_minutes * 60_000
-        if (start < rowEnd && rowStart < end) {
+        const rowStart = new Date(row.start)
+        const rowEnd = new Date(
+          rowStart.getTime() + row.duration_minutes * 60_000,
+        )
+        if (overlaps(start, end, rowStart, rowEnd)) {
           throw conflict('The slot is already booked')
         }
       }

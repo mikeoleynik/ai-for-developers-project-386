@@ -232,6 +232,19 @@ describe('bookings', () => {
     await app.close()
   })
 
+  it('rejects a start with sub-second precision', async () => {
+    const app = await makeApp()
+    await createEventType(app)
+
+    const response = await book(app, {
+      ...validBooking,
+      start: '2026-06-01T07:00:00.500Z',
+    })
+    expect(response.statusCode).toBe(422)
+
+    await app.close()
+  })
+
   it('rejects a meeting that does not fit into working hours', async () => {
     const app = await makeApp()
     await createEventType(app)

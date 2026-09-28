@@ -10,9 +10,6 @@ export class ApiError extends Error {
   }
 }
 
-export const badRequest = (message: string) =>
-  new ApiError(400, 'bad_request', message)
-
 export const notFound = (message: string) =>
   new ApiError(404, 'not_found', message)
 
