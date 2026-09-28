@@ -372,3 +372,33 @@ describe('availability', () => {
     await app.close()
   })
 })
+
+describe('owner upcoming list', () => {
+  it('returns only future bookings ordered by start', async () => {
+    const clock = { instant: new Date('2026-06-01T05:30:00.000Z') }
+    const app = await makeApp(() => clock.instant)
+    await createEventType(app)
+    await book(app, {
+      ...validBooking,
+      start: '2026-06-01T07:00:00.000Z',
+      guestName: 'Первый',
+    })
+    await book(app, {
+      ...validBooking,
+      start: '2026-06-01T08:00:00.000Z',
+      guestName: 'Второй',
+    })
+
+    const before = await app.inject({ method: 'GET', url: '/bookings' })
+    expect(before.json().map((booking: { start: string }) => booking.start))
+      .toEqual(['2026-06-01T07:00:00.000Z', '2026-06-01T08:00:00.000Z'])
+
+    clock.instant = new Date('2026-06-01T07:30:00.000Z')
+
+    const after = await app.inject({ method: 'GET', url: '/bookings' })
+    expect(after.json().map((booking: { guestName: string }) => booking.guestName))
+      .toEqual(['Второй'])
+
+    await app.close()
+  })
+})
