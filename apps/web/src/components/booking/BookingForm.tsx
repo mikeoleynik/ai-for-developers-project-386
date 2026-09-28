@@ -48,9 +48,6 @@ export function BookingForm({ eventTypeId, start }: Props) {
         <p className="mt-2 text-muted-foreground">
           {formatSlot(booking.start)}
         </p>
-        <p className="mt-1 text-muted-foreground">
-          Подтверждение отправлено на {booking.guestEmail}.
-        </p>
       </section>
     )
   }

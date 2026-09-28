@@ -1,6 +1,6 @@
 import { unprocessable } from '../errors.js'
 import type { AppConfig } from '../config.js'
-import type { Interval } from './repository.js'
+import { overlaps, type Interval } from './interval.js'
 import {
   addDays,
   compareDateStrings,
@@ -14,15 +14,6 @@ import {
 export type DayAvailability = {
   date: string
   startTimes: string[]
-}
-
-export function overlaps(
-  aStart: Date,
-  aEnd: Date,
-  bStart: Date,
-  bEnd: Date,
-): boolean {
-  return aStart.getTime() < bEnd.getTime() && bStart.getTime() < aEnd.getTime()
 }
 
 export function bookingWindow(
@@ -125,6 +116,7 @@ export function assertBookableStart(params: {
   const { second } = localDateTime(start, config.timeZone)
   const minutesOfDay = localMinutesOfDay(start, config.timeZone)
   if (
+    start.getUTCMilliseconds() !== 0 ||
     second !== 0 ||
     !Number.isInteger(minutesOfDay) ||
     minutesOfDay % config.slotMinutes !== 0

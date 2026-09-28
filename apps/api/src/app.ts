@@ -51,11 +51,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
       validation?: unknown
     }
     const statusCode = err.statusCode ?? 500
-    const code = err.validation
-      ? 'validation_error'
-      : statusCode === 501
-        ? 'not_implemented'
-        : 'internal_error'
+    const code = err.validation ? 'validation_error' : 'internal_error'
 
     reply.status(statusCode).send({
       error: {
