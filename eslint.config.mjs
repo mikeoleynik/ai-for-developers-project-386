@@ -39,6 +39,12 @@ export default defineConfig(
     rules: { 'react-refresh/only-export-components': 'off' },
   },
   {
+    name: 'e2e',
+    files: ['apps/e2e/**/*.ts'],
+    languageOptions: { globals: globals.node },
+    extends: [js.configs.recommended, tseslint.configs.recommended],
+  },
+  {
     name: 'web-node-context',
     files: ['apps/web/vite.config.ts'],
     languageOptions: { globals: globals.node },

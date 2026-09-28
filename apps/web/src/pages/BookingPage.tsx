@@ -150,7 +150,7 @@ export function BookingPage() {
           {availability.status === 'ready' && (
             <div className="mt-4 space-y-5">
               {availability.days.map((day) => (
-                <div key={day.date}>
+                <div key={day.date} data-date={day.date}>
                   <h3 className="text-sm font-medium capitalize">
                     {formatDay(day.date)}
                   </h3>
