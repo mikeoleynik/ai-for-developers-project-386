@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import fastify from 'fastify'
 import openapiGlue from 'fastify-openapi-glue'
 
-import type { AppConfig } from './config.js'
+import { defaultConfig, type AppConfig } from './config.js'
 import { createServiceHandlers } from './handlers/index.js'
 import { createSqliteRepository } from './domain/repository.js'
 import { ApiError } from './errors.js'
@@ -27,8 +27,10 @@ export async function buildApp(options: BuildAppOptions = {}) {
     mkdirSync(dirname(databasePath), { recursive: true })
   }
 
+  const config = options.config ?? defaultConfig
+  const now = options.now ?? (() => new Date())
   const repository = createSqliteRepository(databasePath)
-  const serviceHandlers = createServiceHandlers(repository)
+  const serviceHandlers = createServiceHandlers(repository, config, now)
 
   const server = fastify()
 
