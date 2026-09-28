@@ -19,6 +19,9 @@ export function Header() {
           <NavLink to="/events" className={navLinkClass}>
             Предстоящие события
           </NavLink>
+          <NavLink to="/event-types" className={navLinkClass}>
+            Виды встреч
+          </NavLink>
         </nav>
       </div>
     </header>
