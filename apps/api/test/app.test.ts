@@ -245,3 +245,130 @@ describe('bookings', () => {
     await app.close()
   })
 })
+
+async function availability(
+  app: Awaited<ReturnType<typeof buildApp>>,
+  query: Record<string, string>,
+) {
+  const search = new URLSearchParams(query).toString()
+  return app.inject({
+    method: 'GET',
+    url: `/availability?${search}`,
+  })
+}
+
+describe('availability', () => {
+  it('returns aligned free starts inside working hours', async () => {
+    const app = await makeApp()
+    await createEventType(app)
+
+    const response = await availability(app, {
+      eventTypeId: 'intro',
+      from: '2026-06-01',
+      to: '2026-06-01',
+    })
+
+    expect(response.statusCode).toBe(200)
+    const days = response.json()
+    expect(days).toHaveLength(1)
+    expect(days[0].date).toBe('2026-06-01')
+    expect(days[0].startTimes[0]).toBe('2026-06-01T06:00:00.000Z')
+    expect(days[0].startTimes).toContain('2026-06-01T14:30:00.000Z')
+    expect(days[0].startTimes).not.toContain('2026-06-01T15:00:00.000Z')
+
+    await app.close()
+  })
+
+  it('accounts for the event type duration', async () => {
+    const app = await makeApp()
+    await createEventType(app, {
+      id: 'deep-dive',
+      title: 'Разбор',
+      durationMinutes: 60,
+    })
+
+    const response = await availability(app, {
+      eventTypeId: 'deep-dive',
+      from: '2026-06-01',
+      to: '2026-06-01',
+    })
+
+    const startTimes = response.json()[0].startTimes
+    expect(startTimes).toContain('2026-06-01T14:00:00.000Z')
+    expect(startTimes).not.toContain('2026-06-01T14:30:00.000Z')
+
+    await app.close()
+  })
+
+  it('excludes a booked slot', async () => {
+    const app = await makeApp()
+    await createEventType(app)
+    await book(app)
+
+    const response = await availability(app, {
+      eventTypeId: 'intro',
+      from: '2026-06-01',
+      to: '2026-06-01',
+    })
+
+    expect(response.json()[0].startTimes).not.toContain(
+      '2026-06-01T07:00:00.000Z',
+    )
+
+    await app.close()
+  })
+
+  it('excludes a slot overlapped by another event type', async () => {
+    const app = await makeApp()
+    await createEventType(app)
+    await createEventType(app, {
+      id: 'deep-dive',
+      title: 'Разбор',
+      durationMinutes: 60,
+    })
+    await book(app, {
+      ...validBooking,
+      eventTypeId: 'deep-dive',
+      start: '2026-06-01T06:30:00.000Z',
+    })
+
+    const response = await availability(app, {
+      eventTypeId: 'intro',
+      from: '2026-06-01',
+      to: '2026-06-01',
+    })
+
+    const startTimes = response.json()[0].startTimes
+    expect(startTimes).not.toContain('2026-06-01T06:30:00.000Z')
+    expect(startTimes).not.toContain('2026-06-01T07:00:00.000Z')
+
+    await app.close()
+  })
+
+  it('rejects a range outside the booking window with 422', async () => {
+    const app = await makeApp()
+    await createEventType(app)
+
+    const response = await availability(app, {
+      eventTypeId: 'intro',
+      from: '2026-05-31',
+      to: '2026-06-01',
+    })
+    expect(response.statusCode).toBe(422)
+
+    await app.close()
+  })
+
+  it('rejects an unknown event type with 404', async () => {
+    const app = await makeApp()
+
+    const response = await availability(app, {
+      eventTypeId: 'missing',
+      from: '2026-06-01',
+      to: '2026-06-01',
+    })
+    expect(response.statusCode).toBe(404)
+
+    await app.close()
+  })
+})

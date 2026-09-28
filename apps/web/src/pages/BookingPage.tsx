@@ -3,8 +3,19 @@ import { Link, useParams } from 'react-router-dom'
 
 import { BookingForm } from '@/components/booking/BookingForm'
 import { buttonVariants } from '@/components/ui/button'
-import { eventTypesList, type EventType } from '@/lib/api'
+import {
+  availabilityList,
+  eventTypesList,
+  type DayAvailability,
+  type EventType,
+} from '@/lib/api'
 import { apiErrorMessage } from '@/lib/errors'
+import {
+  addDaysToDate,
+  formatDay,
+  formatTime,
+  todayInCalendarZone,
+} from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 type State =
@@ -13,10 +24,18 @@ type State =
   | { status: 'not-found' }
   | { status: 'ready'; eventType: EventType }
 
+type AvailabilityState =
+  | { status: 'loading' }
+  | { status: 'error'; message: string }
+  | { status: 'ready'; days: DayAvailability[] }
+
 export function BookingPage() {
   const { eventTypeId = '' } = useParams()
   const [state, setState] = useState<State>({ status: 'loading' })
-  const [start, setStart] = useState('')
+  const [availability, setAvailability] = useState<AvailabilityState>({
+    status: 'loading',
+  })
+  const [start, setStart] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
@@ -43,6 +62,41 @@ export function BookingPage() {
       active = false
     }
   }, [eventTypeId])
+
+  useEffect(() => {
+    if (state.status !== 'ready') return
+    let active = true
+
+    const from = todayInCalendarZone()
+    const to = addDaysToDate(from, 13)
+
+    availabilityList({
+      query: { eventTypeId: state.eventType.id, from, to },
+    })
+      .then(({ data, error }) => {
+        if (!active) return
+        if (error) {
+          setAvailability({
+            status: 'error',
+            message: apiErrorMessage(error),
+          })
+          return
+        }
+        setAvailability({ status: 'ready', days: data ?? [] })
+      })
+      .catch((error: unknown) => {
+        if (active) {
+          setAvailability({
+            status: 'error',
+            message: apiErrorMessage(error),
+          })
+        }
+      })
+
+    return () => {
+      active = false
+    }
+  }, [state])
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
@@ -81,24 +135,58 @@ export function BookingPage() {
             {state.eventType.durationMinutes} мин
           </p>
 
-          <div className="mt-8 space-y-1">
-            <label htmlFor="booking-start" className="block text-sm font-medium">
-              Начало
-            </label>
-            <input
-              id="booking-start"
-              type="datetime-local"
-              value={start}
-              onChange={(event) => setStart(event.target.value)}
-              className="rounded-lg border bg-background px-3 py-2"
-            />
-          </div>
+          <h2 className="mt-8 text-xl font-semibold">Свободное время</h2>
+
+          {availability.status === 'loading' && (
+            <p className="mt-4 text-muted-foreground">Загружаем слоты…</p>
+          )}
+
+          {availability.status === 'error' && (
+            <p role="alert" className="mt-4 text-destructive">
+              {availability.message}
+            </p>
+          )}
+
+          {availability.status === 'ready' && (
+            <div className="mt-4 space-y-5">
+              {availability.days.map((day) => (
+                <div key={day.date}>
+                  <h3 className="text-sm font-medium capitalize">
+                    {formatDay(day.date)}
+                  </h3>
+                  {day.startTimes.length === 0 ? (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Нет свободного времени
+                    </p>
+                  ) : (
+                    <ul className="mt-2 flex flex-wrap gap-2">
+                      {day.startTimes.map((slot) => (
+                        <li key={slot}>
+                          <button
+                            type="button"
+                            aria-pressed={start === slot}
+                            onClick={() => setStart(slot)}
+                            className={cn(
+                              buttonVariants({
+                                variant:
+                                  start === slot ? 'default' : 'outline',
+                                size: 'sm',
+                              }),
+                            )}
+                          >
+                            {formatTime(slot)}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
           {start && (
-            <BookingForm
-              eventTypeId={state.eventType.id}
-              start={new Date(start).toISOString()}
-            />
+            <BookingForm eventTypeId={state.eventType.id} start={start} />
           )}
         </>
       )}
