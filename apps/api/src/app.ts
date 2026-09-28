@@ -1,18 +1,48 @@
+import { mkdirSync } from 'node:fs'
+import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import fastify from 'fastify'
 import openapiGlue from 'fastify-openapi-glue'
 
-import { serviceHandlers } from './contract-handlers.js'
+import type { AppConfig } from './config.js'
+import { createServiceHandlers } from './handlers/index.js'
+import { createSqliteRepository } from './domain/repository.js'
+import { ApiError } from './errors.js'
 
 const specification = fileURLToPath(
   new URL('../generated/openapi.yaml', import.meta.url),
 )
 
-export async function buildApp() {
+export type BuildAppOptions = {
+  databasePath?: string
+  config?: AppConfig
+  now?: () => Date
+}
+
+export async function buildApp(options: BuildAppOptions = {}) {
+  const databasePath =
+    options.databasePath ?? process.env.DATABASE_PATH ?? 'data/calendar.sqlite'
+  if (databasePath !== ':memory:') {
+    mkdirSync(dirname(databasePath), { recursive: true })
+  }
+
+  const repository = createSqliteRepository(databasePath)
+  const serviceHandlers = createServiceHandlers(repository)
+
   const server = fastify()
 
   server.setErrorHandler((error: unknown, _request, reply) => {
+    if (error instanceof ApiError) {
+      reply.status(error.statusCode).send({
+        error: {
+          code: error.code,
+          message: error.message,
+        },
+      })
+      return
+    }
+
     const err = error as {
       statusCode?: number
       message: string
@@ -31,6 +61,10 @@ export async function buildApp() {
         message: err.message,
       },
     })
+  })
+
+  server.addHook('onClose', async () => {
+    repository.close()
   })
 
   server.get('/ping', async () => {
