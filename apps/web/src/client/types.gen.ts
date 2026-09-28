@@ -30,7 +30,7 @@ export type DayAvailability = {
     startTimes: Array<string>;
 };
 
-export type ErrorResponse = {
+export type ErrorBody = {
     error: ApiError;
 };
 
@@ -38,6 +38,11 @@ export type EventType = {
     id: string;
     title: string;
     description?: string;
+    durationMinutes: number;
+};
+
+export type OwnerBooking = Booking & {
+    eventTypeTitle: string;
     durationMinutes: number;
 };
 
@@ -54,9 +59,17 @@ export type AvailabilityListData = {
 
 export type AvailabilityListErrors = {
     /**
-     * An unexpected error response.
+     * The server could not understand the request due to invalid syntax.
      */
-    default: ErrorResponse;
+    400: ErrorBody;
+    /**
+     * The server cannot find the requested resource.
+     */
+    404: ErrorBody;
+    /**
+     * Client error
+     */
+    422: ErrorBody;
 };
 
 export type AvailabilityListError = AvailabilityListErrors[keyof AvailabilityListErrors];
@@ -81,7 +94,7 @@ export type BookingsListResponses = {
     /**
      * The request has succeeded.
      */
-    200: Array<Booking>;
+    200: Array<OwnerBooking>;
 };
 
 export type BookingsListResponse = BookingsListResponses[keyof BookingsListResponses];
@@ -95,18 +108,30 @@ export type BookingsCreateData = {
 
 export type BookingsCreateErrors = {
     /**
-     * An unexpected error response.
+     * The server could not understand the request due to invalid syntax.
      */
-    default: ErrorResponse;
+    400: ErrorBody;
+    /**
+     * The server cannot find the requested resource.
+     */
+    404: ErrorBody;
+    /**
+     * The request conflicts with the current state of the server.
+     */
+    409: ErrorBody;
+    /**
+     * Client error
+     */
+    422: ErrorBody;
 };
 
 export type BookingsCreateError = BookingsCreateErrors[keyof BookingsCreateErrors];
 
 export type BookingsCreateResponses = {
     /**
-     * The request has succeeded.
+     * The request has succeeded and a new resource has been created as a result.
      */
-    200: Booking;
+    201: Booking;
 };
 
 export type BookingsCreateResponse = BookingsCreateResponses[keyof BookingsCreateResponses];
@@ -136,18 +161,22 @@ export type EventTypesCreateData = {
 
 export type EventTypesCreateErrors = {
     /**
-     * An unexpected error response.
+     * The server could not understand the request due to invalid syntax.
      */
-    default: ErrorResponse;
+    400: ErrorBody;
+    /**
+     * Client error
+     */
+    422: ErrorBody;
 };
 
 export type EventTypesCreateError = EventTypesCreateErrors[keyof EventTypesCreateErrors];
 
 export type EventTypesCreateResponses = {
     /**
-     * The request has succeeded.
+     * The request has succeeded and a new resource has been created as a result.
      */
-    200: EventType;
+    201: EventType;
 };
 
 export type EventTypesCreateResponse = EventTypesCreateResponses[keyof EventTypesCreateResponses];

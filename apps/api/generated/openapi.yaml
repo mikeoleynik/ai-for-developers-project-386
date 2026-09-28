@@ -35,12 +35,24 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DayAvailability'
-        default:
-          description: An unexpected error response.
+        '400':
+          description: The server could not understand the request due to invalid syntax.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
   /bookings:
     get:
       operationId: Bookings_list
@@ -53,23 +65,41 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Booking'
+                  $ref: '#/components/schemas/OwnerBooking'
     post:
       operationId: Bookings_create
       parameters: []
       responses:
-        '200':
-          description: The request has succeeded.
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Booking'
-        default:
-          description: An unexpected error response.
+        '400':
+          description: The server could not understand the request due to invalid syntax.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ErrorBody'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '409':
+          description: The request conflicts with the current state of the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
       requestBody:
         required: true
         content:
@@ -93,18 +123,24 @@ paths:
       operationId: EventTypes_create
       parameters: []
       responses:
-        '200':
-          description: The request has succeeded.
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventType'
-        default:
-          description: An unexpected error response.
+        '400':
+          description: The server could not understand the request due to invalid syntax.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ErrorBody'
+        '422':
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorBody'
       requestBody:
         required: true
         content:
@@ -176,7 +212,7 @@ components:
           type: array
           items:
             type: string
-    ErrorResponse:
+    ErrorBody:
       type: object
       required:
         - error
@@ -199,3 +235,16 @@ components:
         durationMinutes:
           type: integer
           format: int32
+    OwnerBooking:
+      type: object
+      required:
+        - eventTypeTitle
+        - durationMinutes
+      properties:
+        eventTypeTitle:
+          type: string
+        durationMinutes:
+          type: integer
+          format: int32
+      allOf:
+        - $ref: '#/components/schemas/Booking'

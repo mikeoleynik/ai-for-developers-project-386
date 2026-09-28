@@ -12,9 +12,37 @@ model ApiError {
   message: string;
 }
 
-@error
-model ErrorResponse {
+model ErrorBody {
   error: ApiError;
+}
+
+@error
+model BadRequest {
+  @statusCode statusCode: 400;
+  @body body: ErrorBody;
+}
+
+@error
+model NotFound {
+  @statusCode statusCode: 404;
+  @body body: ErrorBody;
+}
+
+@error
+model Conflict {
+  @statusCode statusCode: 409;
+  @body body: ErrorBody;
+}
+
+@error
+model UnprocessableEntity {
+  @statusCode statusCode: 422;
+  @body body: ErrorBody;
+}
+
+model Created<T> {
+  @statusCode statusCode: 201;
+  @body body: T;
 }
 
 model EventType {
@@ -40,6 +68,11 @@ model Booking {
   createdAt: utcDateTime;
 }
 
+model OwnerBooking extends Booking {
+  eventTypeTitle: string;
+  durationMinutes: int32;
+}
+
 model DayAvailability {
   date: string;
   startTimes: string[];
@@ -48,7 +81,11 @@ model DayAvailability {
 @route("/event-types")
 interface EventTypes {
   @get list(): EventType[];
-  @post create(@body body: EventType): EventType | ErrorResponse;
+
+  @post
+  create(
+    @body body: EventType,
+  ): Created<EventType> | BadRequest | UnprocessableEntity;
 }
 
 @route("/availability")
@@ -57,11 +94,15 @@ interface Availability {
     @query eventTypeId: string,
     @query from: string,
     @query to: string,
-  ): DayAvailability[] | ErrorResponse;
+  ): DayAvailability[] | BadRequest | NotFound | UnprocessableEntity;
 }
 
 @route("/bookings")
 interface Bookings {
-  @get list(): Booking[];
-  @post create(@body body: CreateBooking): Booking | ErrorResponse;
+  @get list(): OwnerBooking[];
+
+  @post
+  create(
+    @body body: CreateBooking,
+  ): Created<Booking> | BadRequest | NotFound | Conflict | UnprocessableEntity;
 }
