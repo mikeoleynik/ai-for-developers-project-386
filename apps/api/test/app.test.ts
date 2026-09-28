@@ -95,3 +95,153 @@ describe('event types', () => {
     await app.close()
   })
 })
+
+const validBooking = {
+  eventTypeId: 'intro',
+  start: '2026-06-01T07:00:00.000Z',
+  guestName: 'Анна',
+  guestEmail: 'anna@example.com',
+}
+
+async function book(
+  app: Awaited<ReturnType<typeof buildApp>>,
+  payload: Record<string, unknown> = validBooking,
+) {
+  return app.inject({
+    method: 'POST',
+    url: '/bookings',
+    payload,
+  })
+}
+
+describe('bookings', () => {
+  it('creates a booking and lists it for the owner', async () => {
+    const app = await makeApp()
+    await createEventType(app)
+
+    const created = await book(app)
+    expect(created.statusCode).toBe(201)
+    expect(created.json()).toMatchObject({
+      eventTypeId: 'intro',
+      guestName: 'Анна',
+      guestEmail: 'anna@example.com',
+      start: '2026-06-01T07:00:00.000Z',
+    })
+
+    const listed = await app.inject({ method: 'GET', url: '/bookings' })
+    expect(listed.statusCode).toBe(200)
+    expect(listed.json()).toHaveLength(1)
+    expect(listed.json()[0]).toMatchObject({
+      eventTypeTitle: 'Знакомство',
+      durationMinutes: 30,
+    })
+
+    await app.close()
+  })
+
+  it('rejects an overlapping booking of another event type with 409', async () => {
+    const app = await makeApp()
+    await createEventType(app)
+    await createEventType(app, {
+      id: 'deep-dive',
+      title: 'Разбор',
+      durationMinutes: 60,
+    })
+    await book(app)
+
+    const overlapping = await book(app, {
+      ...validBooking,
+      eventTypeId: 'deep-dive',
+      start: '2026-06-01T06:30:00.000Z',
+    })
+    expect(overlapping.statusCode).toBe(409)
+    expect(overlapping.json().error.code).toBe('conflict')
+
+    await app.close()
+  })
+
+  it('rejects an unknown event type with 404', async () => {
+    const app = await makeApp()
+
+    const response = await book(app, {
+      ...validBooking,
+      eventTypeId: 'missing',
+    })
+    expect(response.statusCode).toBe(404)
+    expect(response.json().error.code).toBe('not_found')
+
+    await app.close()
+  })
+
+  it('rejects an invalid email with 422', async () => {
+    const app = await makeApp()
+    await createEventType(app)
+
+    const response = await book(app, { ...validBooking, guestEmail: 'bad' })
+    expect(response.statusCode).toBe(422)
+
+    await app.close()
+  })
+
+  it('rejects an empty guest name with 422', async () => {
+    const app = await makeApp()
+    await createEventType(app)
+
+    const response = await book(app, { ...validBooking, guestName: '   ' })
+    expect(response.statusCode).toBe(422)
+
+    await app.close()
+  })
+
+  it('rejects a start in the past with 422', async () => {
+    const app = await makeApp()
+    await createEventType(app)
+
+    const response = await book(app, {
+      ...validBooking,
+      start: '2026-05-31T07:00:00.000Z',
+    })
+    expect(response.statusCode).toBe(422)
+
+    await app.close()
+  })
+
+  it('rejects a start outside the booking window with 422', async () => {
+    const app = await makeApp()
+    await createEventType(app)
+
+    const response = await book(app, {
+      ...validBooking,
+      start: '2026-06-20T07:00:00.000Z',
+    })
+    expect(response.statusCode).toBe(422)
+
+    await app.close()
+  })
+
+  it('rejects a start that is not aligned to the 30-minute grid', async () => {
+    const app = await makeApp()
+    await createEventType(app)
+
+    const response = await book(app, {
+      ...validBooking,
+      start: '2026-06-01T07:15:00.000Z',
+    })
+    expect(response.statusCode).toBe(422)
+
+    await app.close()
+  })
+
+  it('rejects a meeting that does not fit into working hours', async () => {
+    const app = await makeApp()
+    await createEventType(app)
+
+    const response = await book(app, {
+      ...validBooking,
+      start: '2026-06-01T14:45:00.000Z',
+    })
+    expect(response.statusCode).toBe(422)
+
+    await app.close()
+  })
+})
