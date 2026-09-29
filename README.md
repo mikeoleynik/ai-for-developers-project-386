@@ -3,6 +3,8 @@
 
 [![hexlet-check](https://github.com/mikeoleynik/ai-for-developers-project-386/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/mikeoleynik/ai-for-developers-project-386/actions)
 
+**Демо:** https://call-calendar-rw6w.onrender.com — публичный деплой на Render (бесплатный тариф, первый запрос после простоя может занять до минуты).
+
 Разработайте совместно с ИИ сервис для бронирования календаря
 
 Учебный проект Хекслета: https://ru.hexlet.io/programs/ai-for-developers
