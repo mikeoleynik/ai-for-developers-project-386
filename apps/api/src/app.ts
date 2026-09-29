@@ -72,6 +72,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
   await server.register(openapiGlue, {
     specification,
     serviceHandlers,
+    ...(config.apiPrefix ? { prefix: config.apiPrefix } : {}),
   })
 
   return server
