@@ -12,6 +12,7 @@
     "generate": "tsp compile tsp/main.tsp --emit @typespec/openapi3 --output-dir generated --option @typespec/openapi3.output-file=openapi.yaml && cp generated/@typespec/openapi3/openapi.yaml generated/openapi.yaml"
   },
   "dependencies": {
+    "@fastify/static": "^9.3.0",
     "better-sqlite3": "^13.0.3",
     "fastify": "^5.12.5",
     "fastify-openapi-glue": "^4.11.5"

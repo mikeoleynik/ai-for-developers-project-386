@@ -4,6 +4,7 @@ export type AppConfig = {
   workDayEndMinutes: number
   windowDays: number
   slotMinutes: number
+  apiPrefix: string
 }
 
 export const defaultConfig: AppConfig = {
@@ -12,4 +13,5 @@ export const defaultConfig: AppConfig = {
   workDayEndMinutes: 18 * 60,
   windowDays: 14,
   slotMinutes: 30,
+  apiPrefix: process.env.API_PREFIX ?? '',
 }
