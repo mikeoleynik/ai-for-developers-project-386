@@ -123,7 +123,9 @@ describe('страница бронирования', () => {
 
     const alert = await screen.findByRole('alert')
     expect(
-      within(alert).getByText('The slot is already booked'),
+      within(alert).getByText(
+        'Это время уже занято. Выберите, пожалуйста, другое время.',
+      ),
     ).toBeInTheDocument()
     expect(
       screen.queryByRole('heading', { name: 'Вы записаны' }),
