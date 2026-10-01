@@ -1,0 +1,59 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "atlassian": {
+      "type": "local",
+      "command": ["uvx", "mcp-atlassian"],
+      "enabled": true,
+      "environment": {
+        "JIRA_URL": "https://jira.fbcd.ru",
+        "JIRA_USERNAME": "{env:JIRA_USERNAME}",
+        "JIRA_PERSONAL_TOKEN": "{env:JIRA_PERSONAL_TOKEN}",
+        "CONFLUENCE_URL": "https://wiki.fbcd.ru",
+        "CONFLUENCE_USERNAME": "{env:JIRA_USERNAME}",
+        "CONFLUENCE_PERSONAL_TOKEN": "{env:CONFLUENCE_PERSONAL_TOKEN}"
+      }
+    },
+    "gitlab": {
+      "type": "local",
+      "command": ["npx", "-y", "@zereight/mcp-gitlab"],
+      "enabled": true,
+      "environment": {
+        "GITLAB_PERSONAL_ACCESS_TOKEN": "{env:GITLAB_PERSONAL_ACCESS_TOKEN}",
+        "GITLAB_API_URL": "https://gitlab.fbcd.ru/api/v4",
+        "USE_GITLAB_WIKI": "false",
+        "USE_MILESTONE": "false",
+        "USE_PIPELINE": "false",
+        "GITLAB_TOOLSETS": "merge_requests,repositories,branches,pipelines,search"
+      }
+    },
+    "grafana": {
+      "type": "local",
+      "command": ["uvx", "mcp-grafana"],
+      "enabled": true,
+      "environment": {
+        "GRAFANA_URL": "https://grafana.fbcd.ru",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "{env:GRAFANA_SERVICE_ACCOUNT_TOKEN}"
+      }
+    },
+    "sentry": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@sentry/mcp-server@latest",
+        "--access-token={env:SENTRY_ACCESS_TOKEN}",
+        "--host=sentry.fbcd.ru"
+      ],
+      "enabled": true
+    },
+    "bvk-mcp": {
+      "type": "remote",
+      "url": "https://bvk-mcp-auto-vm-vk-cmt.staging.fbcd.ru/mcp",
+      "enabled": true,
+      "headers": {
+        "apiKey": "{env:BVK_MCP_API_KEY}"
+      }
+    }
+  }
+}
